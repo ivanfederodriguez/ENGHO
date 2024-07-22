@@ -152,10 +152,10 @@ corr_datos2 = fdn2[['gastot','ingtoth','clima_educativo','as','jestado','casado'
 plt.figure(figsize=(8, 6))
 sns.heatmap(corr_datos1, annot=True)
 #sns.heatmap(corr_datos2, annot=True)
-'''
-plt.show()
-print(fdata_nea.describe())
 
+plt.show()
+'''
+'''
 variables = ['gastot','ingtoth','clima_educativo','as','jestado','casado','jedad_agrup','univ','sec','prim','regten2','regten1','propauto','menor18','menor14','mayor65']
 titulos = ['gastot','ingtoth','clima_educativo','as','jestado','casado','jedad_agrup','univ','sec','prim','regten2','regten1','propauto','menor18','menor14','mayor65']
 xs = ['gastot','ingtoth','clima_educativo','as','jestado','casado','jedad_agrup','univ','sec','prim','regten2','regten1','propauto','menor18','menor14','mayor65']
@@ -172,3 +172,20 @@ for i in range(4):
 
 plt.subplots_adjust(hspace=0.7)
 plt.show()
+'''
+#cosas de regresión
+X = fdn2['ingtoth']
+X = sm.add_constant(X)
+y = fdn2[['gastot']]
+
+reg1 = sm.OLS(y,X).fit()
+print(reg1.summary())
+
+
+
+X = fdn2[['ingtoth','clima_educativo','as','jestado','casado','jedad_agrup','univ','sec','prim','regten2','regten1','propauto','menor18','menor14','mayor65']]
+X = sm.add_constant(X)
+y = fdn2[['gastot']]
+
+reg2 = sm.OLS(y,X).fit()
+print(reg2.summary())
