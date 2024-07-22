@@ -3,9 +3,13 @@ import numpy as np
 #este filtro, se aplica a cualquier i provincia de datasert y devuelve uno nuevo con la inforamción modificada de esa provincia
 #ignora los posibles efectos de 'region','provincia','id','gastotpc','gc09_01','gc09_02','gc09_03','gc09_04','gc09_05','gc09_06','gc09_07','gc09_08','gc09_09','ingpch','hacina','jcomed','menor18','menor14','mayor65'
 #por favor mejorar porque esta construido en base casi nada de información sobre la correlacion
-def filtro1(data,i):
+def filtro1(data,i,percapita=False):
   n_data=data[data['provincia']==i]
-  fn_data= n_data.drop(['region','provincia','id','gastotpc','gc09_01','gc09_02','gc09_03','gc09_04','gc09_05','gc09_06','gc09_07','gc09_08','gc09_09','ingpch','hacina','jcomed','menor18','menor14','mayor65'],axis=1)
+  fn_data= n_data.drop(['region','provincia','id',,'gc09_01','gc09_02','gc09_03','gc09_04','gc09_05','gc09_06','gc09_07','gc09_08','gc09_09','hacina','jcomed','menor18','menor14','mayor65'],axis=1)
+  if percapita:
+    fn_data.drop(['gastot','ingtoth'],inplace=True)
+  else:
+    fn_data.drop(['gastotpc','ingpch'],inplace=True)  
   #proprauto
   fn_data['propauto'] =  fn_data['propauto'].apply(lambda x: 1 if x in [2, 3] else 0)
 
