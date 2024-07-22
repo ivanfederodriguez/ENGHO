@@ -4,9 +4,26 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from statsmodels.stats.weightstats import DescrStatsW
 # Cargar los datos
-data = pd.read_csv('/content/drive/MyDrive/Colab Notebooks/diplo/engho2018_hogares_diplo.txt')
-# Explorar los datos
-#por ahora sigue siendo el modelo mas simple que agarra la menor cantidad variables posibles*********************************** no olvidar borrar cuando se creen modelos mas complejos
+import requests
+from io import BytesIO
+from zipfile import ZipFile
+
+# URL del archivo zip
+url = "https://www.indec.gob.ar/ftp/cuadros/menusuperior/engho/engho2018_hogares.zip"
+
+# Descargar el contenido del archivo zip
+response = requests.get(url)
+zip_file = ZipFile(BytesIO(response.content))
+
+# Obtener la lista de archivos en el zip para encontrar el archivo .txt
+files = zip_file.namelist()
+
+# Encontrar el nombre del archivo .txt
+txt_file_name = [file for file in files if file.endswith('.txt')][0]
+
+# Leer el contenido del archivo .txt en un DataFrame de pandas
+with zip_file.open(txt_file_name) as file:
+    data = pd.read_csv(file, delimiter='|')
 #filtrado
 data_nea=data[data['region']==4]
 n=len(data_nea)
