@@ -144,12 +144,30 @@ fdata_nea.drop(['jcomed'],axis=1,inplace=True)#por ahora
 fdn1=fdata_nea.drop(['menor18','menor14','mayor65'],axis=1)
 fdn2=fdata_nea.drop(['cantmiem'],axis=1)
 
-
+'''
+#Matriz de correlación
 corr_datos1 = fdn1[['gastot','ingtoth','clima_educativo','as','jestado','casado','jedad_agrup','univ','prim','regten2','regten1','propauto','cantmiem']].corr()
 corr_datos2 = fdn2[['gastot','ingtoth','clima_educativo','as','jestado','casado','jedad_agrup','univ','prim','regten2','regten1','propauto','menor18','menor14','mayor65']].corr()
 plt.figure(figsize=(8, 6))
 sns.heatmap(corr_datos1, annot=True)
 #sns.heatmap(corr_datos2, annot=True)
-
+'''
 plt.show()
 print(fdata_nea.describe())
+
+variables = ['gastot','ingtoth','clima_educativo','as','jestado','casado','jedad_agrup','univ','sec','prim','regten2','regten1','propauto','menor18','menor14','mayor65']
+titulos = ['gastot','ingtoth','clima_educativo','as','jestado','casado','jedad_agrup','univ','sec','prim','regten2','regten1','propauto','menor18','menor14','mayor65']
+xs = ['gastot','ingtoth','clima_educativo','as','jestado','casado','jedad_agrup','univ','sec','prim','regten2','regten1','propauto','menor18','menor14','mayor65']
+ys = ['Frecuencia',None,None,'Frecuencia',None,None, 'Frecuencia',None,None,'Frecuencia',None,None]
+
+fig, ax = plt.subplots(4, 4, figsize=(16,16))
+
+for i in range(4):
+  for j in range(4):
+    ax[i,j].hist(fdn2[variables[i*2+j]], edgecolor = "white")
+    ax[i,j].set_title(titulos[i*2+j])
+    ax[i,j].set_xlabel(xs[i*2+j])
+    ax[i,j].set_ylabel(ys[i*2+j])
+
+plt.subplots_adjust(hspace=0.7)
+plt.show()
