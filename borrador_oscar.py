@@ -108,6 +108,7 @@ dvsoc_jur= DescrStatsW(fdata_nea['soc_jur'], weights=fdata_nea['pondera'])
 
 
 ''''
+#me imagino que si habrá efecto entre que la sociedad juridica sea propia o no, por eso lo dejo acá
 fdata_nea['propia_soc_jur']=fdata_nea['jocupengh'].apply(lambda x: 1 if x==2 else 0)
 #calculos////////////////////////////////
 mpropia_soc_jur= (fdata_nea['propia_soc_jur']*data_nea['pondera']).mean()
