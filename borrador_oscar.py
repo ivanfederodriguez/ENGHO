@@ -129,8 +129,8 @@ fdata_nea['jpercept']=fdata_nea['jpercept']-1
 mjpercept=(fdata_nea['jpercept']*data_nea['pondera']).mean()
 dvpjpercept= DescrStatsW(fdata_nea['jpercept'], weights=fdata_nea['pondera'])
 
-
-fdata_nea['clima_educativo']=fdata_nea['clima_educativo'].apply(lambda x: round(fdata_nea['clima_educativo'].mean()) if x==99 else x)#si no existe lo tomo como la media, no se cuanto influye
+fdata_nea['clima_educativo']=fdata_nea['clima_educativo'].apply(lambda x: 0 if x==99 else x)
+fdata_nea['clima_educativo']=fdata_nea['clima_educativo'].apply(lambda x: round( fn_data['clima_educativo'].mean()) if x==0 else x)#si no existe lo tomo como la media, no se cuanto influye
 #calculos////////////////////////////////
 mclima_educativo= (fdata_nea['clima_educativo']*data_nea['pondera']).mean()
 dvclima_educativo= DescrStatsW(fdata_nea['clima_educativo'], weights=fdata_nea['pondera'])
