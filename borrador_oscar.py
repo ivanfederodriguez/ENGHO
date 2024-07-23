@@ -91,6 +91,7 @@ with zip_file.open(txt_file_name) as file:
 #mayor_tamaño_provincia=data['provincia'].value_counts().keys()[index(max(data['provincia'].value_counts().values()))]
 fdata_nea=filtro1(data,4,region=True)
 n=fdata_nea.shape[0]
+'''
 fdata_nea['ingpch']=fdata_nea['ingpch'].apply(lambda x: np.log(x) if x>0 else 0)
 X = fdata_nea['ingpch']
 X = sm.add_constant(X)
@@ -109,4 +110,48 @@ print(reg2.summary())
 plt.hist(np.log(fdata_nea['gasto'][fdata_nea['gasto']>0]))
 plt.show()
 plt.hist(np.log(fdata_nea['ingpch'][fdata_nea['ingpch']>0]))
+plt.show()
+'''
+'''
+X = fdata_nea['ingpch']
+X = sm.add_constant(X)
+y = fdata_nea[['gasto']]
+
+reg1 = sm.OLS(y,X).fit()
+print(reg1.summary())
+'''
+ing_mu=(fdata_nea['pondera']*fdata_nea['ingpch']).mean()
+ing_sigma= DescrStatsW(fdata_nea['ingpch'], weights=fdata_nea['pondera']).var
+fdata_nea['ingpch']=(fdata_nea['ingpch'].apply(lambda x: np.log(x) if x>0 else 0))
+
+gasto_mu=(fdata_nea['pondera']*fdata_nea['gastotpc']).mean()
+gasto_sigma=DescrStatsW(fdata_nea['gastotpc'], weights=fdata_nea['pondera']).var
+fdata_nea['gastotpc']=(fdata_nea['gastotpc'].apply(lambda x: np.log(x) if x>0 else 0))
+
+
+X = fdata_nea[['ingpch','clima_educativo','asalariado','propia_soc_jur','propia_soc_no_jur','socio_soc_jur','socio_soc_no_jur','jestado','casado','univ','sec','prim','regten','propauto','cantmiem','edad_25/34','edad_35/49','edad65_mas']]
+X = sm.add_constant(X)
+y = fdata_nea[['gastotpc']]
+reg2 = sm.OLS(y,X).fit()
+print(reg2.summary())
+residuos = reg2.resid
+plt.scatter(range(len(residuos)), residuos, alpha=0.7)
+plt.axhline(y=0, color='r', linestyle='--')
+plt.title('Residuos')
+plt.xlabel('Índice de Observación')
+plt.ylabel('Residuos')
+plt.show()
+'''
+plt.hist(np.log(fdata_nea['gasto'][fdata_nea['gasto']>0]))
+plt.xlabel('niveles de gasto')
+plt.show()
+plt.hist(np.log(fdata_nea['ingpch'][fdata_nea['ingpch']>0]))
+plt.xlabel('gasto en pesos')
+plt.show()
+'''
+predicciones = reg2.predict(X)
+plt.scatter(fdata_nea['ingpch'],fdata_nea['gastotpc'])
+plt.scatter(fdata_nea['gastotpc'], predicciones, label='Valores predichos', color='red')
+plt.ylabel('gast per capita')
+plt.xlabel('ingreso per capita')
 plt.show()
