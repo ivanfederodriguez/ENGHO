@@ -91,7 +91,7 @@ with zip_file.open(txt_file_name) as file:
 #mayor_tamaño_provincia=data['provincia'].value_counts().keys()[index(max(data['provincia'].value_counts().values()))]
 fdata_nea=filtro1(data,4,region=True)
 n=fdata_nea.shape[0]
-
+fdata_nea['ingpch']=fdata_nea['ingpch'].apply(lambda x: np.log(x) if x>0 else 0)
 X = fdata_nea['ingpch']
 X = sm.add_constant(X)
 y = fdata_nea[['gasto']]
