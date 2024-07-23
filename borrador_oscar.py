@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
+from sklearn.preprocessing import StandardScaler
 import statsmodels.api as sm
 from statsmodels.stats.weightstats import DescrStatsW
 def filtro1(data,i,region=False, percapita=False):
@@ -19,17 +20,12 @@ def filtro1(data,i,region=False, percapita=False):
 
 
   #regten regimen de tenencia
-  fn_data['propietario']=  fn_data['regten'].apply(lambda x: 1 if x==1 else 0)
-  fn_data['inquilino']=  fn_data['regten'].apply(lambda x: 1 if x==2 else 0)
-  fn_data['ocupante']=  fn_data['regten'].apply(lambda x: 1 if x==3 else 0)
-
-  fn_data= fn_data.drop(['regten'],axis=1)
+  fn_data['regten']=  fn_data['regten'].apply(lambda x: 1 if x==1 else 0)
 
   #jniveled
-  fn_data['prim']=  fn_data['jniveled'].apply(lambda x: 1 if x==1 else 0)
-  fn_data['sec']=  fn_data['jniveled'].apply(lambda x: 1 if x==3 else 0)
-  fn_data['univ']=  fn_data['jniveled'].apply(lambda x: 1 if x==5 else 0)
-  fn_data['noed/noans']=  fn_data['jniveled'].apply(lambda x: 1 if x==7 else 0)
+  fn_data['prim']=  fn_data['jniveled'].apply(lambda x: 1 if x in[2,3] else 0)
+  fn_data['sec']=  fn_data['jniveled'].apply(lambda x: 1 if x in [4,5] else 0)
+  fn_data['univ']=  fn_data['jniveled'].apply(lambda x: 1 if x==6 else 0)
   #//////////////////////////////////////////
   fn_data= fn_data.drop(['jniveled'],axis=1)
 
@@ -38,23 +34,26 @@ def filtro1(data,i,region=False, percapita=False):
 
 
 
-  fn_data['jedad_agrup']= fn_data['jedad_agrup']-1 #resumen
+  fn_data['edad_25/34']= fn_data['jedad_agrup'].apply(lambda x: 1 if x==3 else 0)
+  fn_data['edad_35/49']= fn_data['jedad_agrup'].apply(lambda x: 1 if x in[4,5] else 0)
+  fn_data['edad65_mas']= fn_data['jedad_agrup'].apply(lambda x: 1 if x==6 else 0)
 
+  fn_data= fn_data.drop(['jedad_agrup'],axis=1)
 
 
   fn_data['casado']= fn_data['jsitconyugal'].apply(lambda x: 1 if x in [1, 2] else 0) #no se que tanto afectaran pensiones y esas cosas, habria que reconsiderar
-
 
 
   fn_data['jestado']= fn_data['jestado'].apply(lambda x: 1 if x==1 else 0)#resumen
 
 
 
-  fn_data['as']= fn_data['jocupengh'].apply(lambda x: 1 if x==1 else 0)
+  fn_data['asalariado']= fn_data['jocupengh'].apply(lambda x: 1 if x==1 else 0)
+  fn_data['propia_soc_jur']= fn_data['jocupengh'].apply(lambda x: 1 if x in [2,3] else 0)
+  fn_data['socio_soc_jur']= fn_data['jocupengh'].apply(lambda x: 1 if x in [4,5] else 0)
+  fn_data['empleado']= fn_data['jocupengh'].apply(lambda x: 1 if x==6 else 0)
 
-
-
-  fn_data['soc_jur']= fn_data['jocupengh'].apply(lambda x: 1 if x in [2,5] else 0)
+  fn_data= fn_data.drop(['jocupengh'],axis=1)
 
 
 
