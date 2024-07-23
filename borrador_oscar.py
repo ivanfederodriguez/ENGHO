@@ -49,9 +49,10 @@ def filtro1(data,i,region=False, percapita=False):
 
 
   fn_data['asalariado']= fn_data['jocupengh'].apply(lambda x: 1 if x==1 else 0)
-  fn_data['propia_soc_jur']= fn_data['jocupengh'].apply(lambda x: 1 if x in [2,3] else 0)
-  fn_data['socio_soc_jur']= fn_data['jocupengh'].apply(lambda x: 1 if x in [4,5] else 0)
-  fn_data['empleado']= fn_data['jocupengh'].apply(lambda x: 1 if x==6 else 0)
+  fn_data['propia_soc_jur']= fn_data['jocupengh'].apply(lambda x: 1 if x==2 else 0)
+  fn_data['propia_soc_no_jur']= fn_data['jocupengh'].apply(lambda x: 1 if x==3 else 0)
+  fn_data['socio_soc_jur']= fn_data['jocupengh'].apply(lambda x: 1 if x==4 else 0)
+  fn_data['socio_soc_no_jur']= fn_data['jocupengh'].apply(lambda x: 1 if x==5 else 0)
 
   fn_data= fn_data.drop(['jocupengh'],axis=1)
 
