@@ -10,12 +10,16 @@ def filtro1(data,i,region=False, percapita=False):
     n_data=data[data['region']==i]
   else:
     n_data=data[data['provincia']==i]
-  fn_data= n_data.drop(['region','provincia','id','gc09_01','gc09_02','gc09_03','gc09_04','gc09_05','gc09_06','gc09_07','gc09_08','gc09_09','hacina','jcomed','cantmiem'],axis=1)
+  fn_data= n_data.drop(['region','provincia','id','hacina','jcomed','cantmiem'],axis=1)
   if percapita:
     fn_data.drop(['gastot','ingtoth'],axis=1,inplace=True)
   else:
     fn_data.drop(['gastotpc','ingpch'],axis=1,inplace=True)  
     #proprauto
+   g3= fn_data[['gc09_01','gc09_02','gc09_03']].mean(axis=1)
+  g6= fn_data[['gc09_01','gc09_02','gc09_03','gc09_04','gc09_05','gc09_06']].mean(axis=1)
+  g9= fn_data[['gc09_01','gc09_02','gc09_03','gc09_04','gc09_05','gc09_06','gc09_07','gc09_08','gc09_09']].mean(axis=1)
+  fn_data['gasto']=(fn_data[['gc09_01','gc09_02','gc09_03','gc09_04','gc09_05','gc09_06','gc09_07','gc09_08','gc09_09']].apply(lambda x: (x.iloc[0:2].sum()>g3)+(x.iloc[3:5].sum()>g6)+(x.iloc[6:8].sum()>g9),axis=1)).mean(axis=1)
   fn_data['propauto'] =  fn_data['propauto'].apply(lambda x: 1 if x in [2, 3] else 0)
 
 
