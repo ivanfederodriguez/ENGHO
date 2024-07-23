@@ -5,6 +5,22 @@ import seaborn as sns
 from sklearn.preprocessing import StandardScaler
 import statsmodels.api as sm
 from statsmodels.stats.weightstats import DescrStatsW
+import requests
+from io import BytesIO
+from zipfile import ZipFile
+
+# URL del archivo zip
+url = "https://www.indec.gob.ar/ftp/cuadros/menusuperior/engho/engho2018_hogares.zip"
+
+# Descargar el contenido del archivo zip
+response = requests.get(url)
+zip_file = ZipFile(BytesIO(response.content))
+
+# Obtener la lista de archivos en el zip para encontrar el archivo .txt
+files = zip_file.namelist()
+
+# Encontrar el nombre del archivo .txt
+txt_file_name = [file for file in files if file.endswith('.txt')][0]
 def filtro1(data,i,region=False):
   n=data.shape[0]
   if region:
@@ -69,11 +85,9 @@ def filtro1(data,i,region=False):
   return fn_data
 #muchas muchas variables
 
-# Cargar los datos
-data = pd.read_csv('/content/drive/MyDrive/Colab Notebooks/diplo/engho2018_hogares_diplo.txt')
-# Explorar los datos
-#por ahora sigue siendo el modelo mas simple que agarra la menor cantidad variables posibles*********************************** no olvidar borrar cuando se creen modelos mas complejos
-#filtrado
+# Leer el contenido del archivo .txt en un DataFrame de pandas
+with zip_file.open(txt_file_name) as file:
+    data= pd.read_csv(file, delimiter='|')
 #mayor_tamaño_provincia=data['provincia'].value_counts().keys()[index(max(data['provincia'].value_counts().values()))]
 fdata_nea=filtro1(data,4,region=True)
 n=fdata_nea.shape[0]
