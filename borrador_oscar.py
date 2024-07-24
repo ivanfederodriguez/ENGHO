@@ -83,7 +83,7 @@ def filtro1(data, i, region=False):
 
 def plot_histograma_gasto(df):
     plt.figure(figsize=(10, 6))
-    plt.hist(df['gasto'], bins=10, color='skyblue', edgecolor='black')
+    plt.hist(df['gastotpc'], bins=10, color='skyblue', edgecolor='black')
     plt.title('Gasto, en 4 categorias')
     plt.xlabel('Gasto')
     plt.ylabel('Frecuencia')
@@ -92,7 +92,7 @@ def plot_histograma_gasto(df):
 
 def plot_histograma_gasto_percapita(df):
     plt.figure(figsize=(10, 6))
-    plt.hist(df['gastotpc'], bins=30, color='skyblue', edgecolor='black')
+    plt.hist(df['gastotpc'].apply(lambda x: np.log(x) if x>0 else 0), bins=30, color='skyblue', edgecolor='black')
     plt.title('Gasto(Log)')
     plt.xlabel('Log del Gasto per capita')
     plt.ylabel('Frecuencia')
@@ -101,33 +101,21 @@ def plot_histograma_gasto_percapita(df):
 
 def plot_histograma_ingpch(df):
     plt.figure(figsize=(10, 6))
-    plt.hist(df['ingpch'], bins=30, color='lightgreen', edgecolor='black')
+    plt.hist(df['ingpch'].apply(lambda x: np.log(x) if x>0 else 0), bins=30, color='lightgreen', edgecolor='black')
     plt.title('Histograma del Ingreso per Cápita (Log)')
     plt.xlabel('Log del Ingreso per Cápita')
     plt.ylabel('Frecuencia')
     plt.grid(True)
     plt.show()
 
-"""
-def plot_heatmap(df):
-    plt.figure(figsize=(14, 10))
-    # Seleccionar solo las columnas numéricas
-    numeric_df = df.select_dtypes(include=[np.number])
-    corr = numeric_df.corr()
-    sns.heatmap(corr, annot=True, cmap='coolwarm', fmt=".2f")
-    plt.title('Heatmap de Correlación de Variables')
-    plt.show()
-"""
-
-
 def plot_bar_gasto_educacion(df):
-    gasto_promedio_educacion = df.groupby(['prim', 'sec', 'univ'])['gasto'].mean().reset_index()
+    gasto_promedio_educacion = df.groupby(['prim', 'sec', 'univ'])['gastotpc'].mean().reset_index()
     gasto_promedio_educacion['Educación'] = gasto_promedio_educacion.apply(
         lambda row: 'Primaria' if row['prim'] == 1 else ('Secundaria' if row['sec'] == 1 else 'Universitaria'),
         axis=1
     )
     plt.figure(figsize=(10, 6))
-    plt.bar(gasto_promedio_educacion['Educación'], gasto_promedio_educacion['gasto'], color=['skyblue', 'lightgreen', 'salmon'])
+    plt.bar(gasto_promedio_educacion['Educación'], gasto_promedio_educacion['gastotpc'], color=['skyblue', 'lightgreen', 'salmon'])
     plt.title('Promedio de Gasto por Nivel de Educación')
     plt.xlabel('Nivel de Educación')
     plt.ylabel('Gasto Promedio')
@@ -138,33 +126,129 @@ if __name__ == "__main__":
     with zip_file.open(txt_file_name) as file:
         data = pd.read_csv(file, delimiter='|')
 
-    fdata_nea = filtro1(data, 4, region=True)
-    n = fdata_nea.shape[0]
+    df_nea = filtro1(data, 4, region=True)
+    n = df_nea.shape[0]
     '''
-    X = fdata_nea['ingpch']
+    X = df_nea['ingpch']
     X = sm.add_constant(X)
-    y = fdata_nea[['gastotpc']]
+    y = df_nea[['gastotpc']]
     reg1 = sm.OLS(y, X).fit()
     print(reg1.summary())
     '''
-    X = fdata_nea[['ingpch','ingpch2','clima_educativo', 'asalariado', 'casado','regten', 'propauto', 'edad_25/34', 'edad_35/49', 'edad65_mas']]
+    X = df_nea[['ingpch','ingpch2','clima_educativo', 'asalariado', 'casado','regten', 'propauto', 'edad_25/34', 'edad_35/49', 'edad65_mas']]
     X = sm.add_constant(X)
-    y = fdata_nea[['gastotpc']]
+    y = df_nea[['gastotpc']]
+    reg1 = sm.OLS(y, X).fit()
+    print(reg1.summary())
+    predicciones = reg1.predict(X)
+    plt.scatter(df_nea['ingpch'],df_nea['gastotpc'])
+    plt.scatter(df_nea['gastotpc'], predicciones, label='Valores predichos', color='red')
+    plt.ylabel('gast per capita')
+    plt.xlabel('ingreso per capita')
+    plt.show()
+    residuos = reg1.resid
+    plt.scatter(range(len(residuos)), residuos, alpha=0.7)
+    plt.show()
+
+    plot_histograma_gasto(df_nea)
+    plot_histograma_gasto_percapita(df_nea)
+    plot_histograma_ingpch(df_nea)
+    plot_bar_gasto_educacion(df_nea)
+
+
+    #/////////////////////////////////////////
+
+
+    df_noa = filtro1(data, 3, region=True)
+    n = df_noa.shape[0]
+    '''
+    X = df_nea['ingpch']
+    X = sm.add_constant(X)
+    y = df_nea[['gastotpc']]
+    reg1 = sm.OLS(y, X).fit()
+    print(reg1.summary())
+    '''
+    X = df_noa[['ingpch','ingpch2','clima_educativo', 'asalariado', 'casado','regten', 'propauto', 'edad_25/34', 'edad_35/49', 'edad65_mas']]
+    X = sm.add_constant(X)
+    y = df_noa[['gastotpc']]
     reg2 = sm.OLS(y, X).fit()
     print(reg2.summary())
     predicciones = reg2.predict(X)
-    plt.scatter(fdata_nea['ingpch'],fdata_nea['gastotpc'])
-    plt.scatter(fdata_nea['gastotpc'], predicciones, label='Valores predichos', color='red')
+    plt.scatter(df_noa['ingpch'],df_noa['gastotpc'])
+    plt.scatter(df_noa['gastotpc'], predicciones, label='Valores predichos', color='red')
     plt.ylabel('gast per capita')
     plt.xlabel('ingreso per capita')
     plt.show()
     residuos = reg2.resid
     plt.scatter(range(len(residuos)), residuos, alpha=0.7)
     plt.show()
+
+    #plot_heatmap(df_nea)
+    plot_histograma_gasto(df_noa)
+    plot_histograma_gasto_percapita(df_noa)
+    plot_histograma_ingpch(df_noa)
+    plot_bar_gasto_educacion(df_noa)
+
+    #/////////////////////////////////////////
+
+    df_cuyo = filtro1(data, 5, region=True)
+    n = df_cuyo.shape[0]
     '''
-    #plot_heatmap(fdata_nea)
-    plot_histograma_gasto(fdata_nea)
-    plot_histograma_gasto_percapita(fdata_nea)
-    plot_histograma_ingpch(fdata_nea)
-    plot_bar_gasto_educacion(fdata_nea)
+    X = df_cuyo['ingpch']
+    X = sm.add_constant(X)
+    y = df_cuyo[['gastotpc']]
+    reg1 = sm.OLS(y, X).fit()
+    print(reg1.summary())
     '''
+    X = df_cuyo[['ingpch','ingpch2','clima_educativo', 'asalariado', 'casado','regten', 'propauto', 'edad_25/34', 'edad_35/49', 'edad65_mas']]
+    X = sm.add_constant(X)
+    y = df_cuyo[['gastotpc']]
+    reg3 = sm.OLS(y, X).fit()
+    print(reg3.summary())
+    predicciones = reg3.predict(X)
+    plt.scatter(df_cuyo['ingpch'],df_cuyo['gastotpc'])
+    plt.scatter(df_cuyo['gastotpc'], predicciones, label='Valores predichos', color='red')
+    plt.ylabel('gast per capita')
+    plt.xlabel('ingreso per capita')
+    plt.show()
+    residuos = reg3.resid
+    plt.scatter(range(len(residuos)), residuos, alpha=0.7)
+    plt.show()
+
+    #plot_heatmap(df_cuyo)
+    plot_histograma_gasto(df_cuyo)
+    plot_histograma_gasto_percapita(df_cuyo)
+    plot_histograma_ingpch(df_cuyo)
+    plot_bar_gasto_educacion(df_cuyo)
+
+    #/////////////////////////////////////////
+
+    df_pat = filtro1(data, 6, region=True)
+    n = df_pat.shape[0]
+    '''
+    X = df_pat['ingpch']
+    X = sm.add_constant(X)
+    y = df_pat[['gastotpc']]
+    reg1 = sm.OLS(y, X).fit()
+    print(reg1.summary())
+    '''
+    X = df_pat[['ingpch','ingpch2','clima_educativo', 'asalariado', 'casado','regten', 'propauto', 'edad_25/34', 'edad_35/49', 'edad65_mas']]
+    X = sm.add_constant(X)
+    y = df_pat[['gastotpc']]
+    reg4 = sm.OLS(y, X).fit()
+    print(reg4.summary())
+    predicciones = reg2.predict(X)
+    plt.scatter(df_pat['ingpch'],df_pat['gastotpc'])
+    plt.scatter(df_pat['gastotpc'], predicciones, label='Valores predichos', color='red')
+    plt.ylabel('gast per capita')
+    plt.xlabel('ingreso per capita')
+    plt.show()
+    residuos = reg4.resid
+    plt.scatter(range(len(residuos)), residuos, alpha=0.7)
+    plt.show()
+
+    #plot_heatmap(df_pat)
+    plot_histograma_gasto(df_pat)
+    plot_histograma_gasto_percapita(df_pat)
+    plot_histograma_ingpch(df_pat)
+    plot_bar_gasto_educacion(df_pat)
